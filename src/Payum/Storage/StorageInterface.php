@@ -9,7 +9,7 @@ interface StorageInterface
     function createModel();
 
     /**
-     * @param object $model
+     * @param object|string $model
      * 
      * @return boolean
      */
@@ -25,9 +25,27 @@ interface StorageInterface
     function updateModel($model);
 
     /**
+     * @param object $model
+     *
+     * @throws \Payum\Exception\InvalidArgumentException if not supported model given.
+     *
+     * @return void
+     */
+    function deleteModel($model);
+
+    /**
      * @param mixed $id
      * 
      * @return object|null
      */
     function findModelById($id);
+
+    /**
+     * @param object $model
+     *
+     * @throws \Payum\Exception\InvalidArgumentException if not supported model given.
+     *
+     * @return Identificator
+     */
+    function getIdentificator($model);
 }

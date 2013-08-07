@@ -1,18 +1,8 @@
 <?php
 namespace Payum\Request;
 
-interface StatusRequestInterface extends InteractiveRequestInterface
+interface StatusRequestInterface extends InteractiveRequestInterface, ModelRequestInterface
 {
-    /**
-     * @return mixed
-     */
-    function getModel();
-
-    /**
-     * @param mixed $model
-     */
-    function setModel($model);
-
     /**
      * @return mixed
      */
@@ -41,6 +31,26 @@ interface StatusRequestInterface extends InteractiveRequestInterface
     /**
      * @return void
      */
+    function markSuspended();
+
+    /**
+     * @return boolean
+     */
+    function isSuspended();
+
+    /**
+     * @return void
+     */
+    function markExpired();
+
+    /**
+     * @return boolean
+     */
+    function isExpired();
+
+    /**
+     * @return void
+     */
     function markCanceled();
 
     /**
@@ -51,12 +61,12 @@ interface StatusRequestInterface extends InteractiveRequestInterface
     /**
      * @return void
      */
-    function markInProgress();
+    function markPending();
 
     /**
      * @return boolean
      */
-    function isInProgress();
+    function isPending();
 
     /**
      * @return void

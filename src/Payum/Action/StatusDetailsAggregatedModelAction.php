@@ -2,27 +2,24 @@
 namespace Payum\Action;
 
 use Payum\Exception\RequestNotSupportedException;
-use Payum\PaymentInstructionAggregateInterface;
+use Payum\Model\DetailsAggregateInterface;
 use Payum\Request\StatusRequestInterface;
 
-class StatusPaymentInstructionAggregateAction extends ActionPaymentAware
+class StatusDetailsAggregatedModelAction extends PaymentAwareAction
 {
     /**
      * {@inheritdoc}
      */
     public function execute($request)
     {
-        /** @var $request CaptureRequest */
+        /** @var $request StatusRequestInterface */
         if (false == $this->supports($request)) {
             throw RequestNotSupportedException::createActionNotSupported($this, $request);
         }
-        
-        $model = $request->getModel();
-        
-        $request->setModel($model->getPaymentInstruction());
-        $this->payment->execute($request);
 
-        $request->setModel($model);
+        $request->setModel($request->getModel()->getDetails());
+        
+        $this->payment->execute($request);
     }
 
     /**
@@ -32,8 +29,8 @@ class StatusPaymentInstructionAggregateAction extends ActionPaymentAware
     {
         return 
             $request instanceof StatusRequestInterface &&
-            $request->getModel() instanceof PaymentInstructionAggregateInterface && 
-            $request->getModel()->getPaymentInstruction()
+            $request->getModel() instanceof DetailsAggregateInterface && 
+            $request->getModel()->getDetails()
         ;
     }
 }

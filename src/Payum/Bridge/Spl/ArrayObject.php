@@ -45,16 +45,50 @@ class ArrayObject extends \ArrayObject
     }
 
     /**
-     * Checks that all given keys a present and contains not empty value
-     *
-     * @param array $indexes
-     *
-     * @return boolean
+     * @param array $required
+     * @param boolean $throwOnInvalid
+     * 
+     * @throws LogicException when one of the required fields is empty
+     * 
+     * @return void
      */
-    public function offsetsExists(array $indexes)
+    public function validatedNotEmpty($required, $throwOnInvalid = true)
     {
-        foreach ($indexes as $index) {
-            if (false == $this[$index]) {
+        $required = is_array($required) ? $required : array($required);
+        
+        foreach ($required as $required) {
+            $value = $this[$required];
+            
+            if (empty($value)) {
+                if ($throwOnInvalid) {
+                    throw new LogicException(sprintf('The %s fields is required.', $required));
+                }
+
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
+    /**
+     * @param array $required
+     * @param boolean $throwOnInvalid
+     *
+     * @throws LogicException when one of the required fields present
+     *
+     * @return void
+     */
+    public function validatedKeysSet($required, $throwOnInvalid = true)
+    {
+        $required = is_array($required) ? $required : array($required);
+
+        foreach ($required as $required) {
+            if (false == $this->offsetExists($required)) {
+                if ($throwOnInvalid) {
+                    throw new LogicException(sprintf('The %s fields is not set.', $required));
+                }
+
                 return false;
             }
         }

@@ -198,6 +198,150 @@ class ArrayObjectTest extends \PHPUnit_Framework_TestCase
         $this->assertInternalType('array', $array);
         $this->assertEquals(array('foo' => 'barbaz'), $array);
     }
+
+    /**
+     * @test
+     * 
+     * @expectedException \Payum\Exception\LogicException
+     * @expectedExceptionMessage The aRequiredField fields is required.
+     */
+    public function throwIfRequiredFieldEmptyAndThrowOnInvalidTrue()
+    {
+        $arrayObject = new ArrayObject();
+
+        $arrayObject->validatedNotEmpty(array('aRequiredField'), $throwOnInvalid = true);
+    }
+
+    /**
+     * @test
+     *
+     * @expectedException \Payum\Exception\LogicException
+     * @expectedExceptionMessage The otherRequiredField fields is required.
+     */
+    public function throwIfSecondRequiredFieldEmptyAndThrowOnInvalidTrue()
+    {
+        $arrayObject = new ArrayObject();
+        $arrayObject['aRequiredField'] = 'foo';
+
+        $arrayObject->validatedNotEmpty(array('aRequiredField', 'otherRequiredField'), $throwOnInvalid = true);
+    }
+
+    /**
+     * @test
+     *
+     * @expectedException \Payum\Exception\LogicException
+     * @expectedExceptionMessage The aRequiredField fields is required.
+     */
+    public function throwByDefaultIfRequiredFieldEmpty()
+    {
+        $arrayObject = new ArrayObject();
+
+        $arrayObject->validatedNotEmpty(array('aRequiredField'));
+    }
+
+    /**
+     * @test
+     */
+    public function shouldReturnFalseIfRequiredFieldEmptyAndThrowOnInvalidFalse()
+    {
+        $arrayObject = new ArrayObject();
+
+        $this->assertFalse($arrayObject->validatedNotEmpty(array('aRequiredField'), $throwOnInvalid = false));
+    }
+
+    /**
+     * @test
+     */
+    public function shouldAllowValidateScalarWhetherItNotEmpty()
+    {
+        $arrayObject = new ArrayObject();
+
+        $this->assertFalse($arrayObject->validatedNotEmpty('aRequiredField', $throwOnInvalid = false));
+    }
+
+    /**
+     * @test
+     */
+    public function shouldReturnTrueIfRequiredFieldsNotEmpty()
+    {
+        $arrayObject = new ArrayObject();
+        $arrayObject['aRequiredField'] = 'foo';
+        $arrayObject['otherRequiredField'] = 'bar';
+
+        $this->assertTrue($arrayObject->validatedNotEmpty(array('aRequiredField', 'otherRequiredField')));
+    }
+
+    /**
+     * @test
+     *
+     * @expectedException \Payum\Exception\LogicException
+     * @expectedExceptionMessage The aRequiredField fields is not set.
+     */
+    public function throwIfRequiredFieldNotSetAndThrowOnInvalidTrue()
+    {
+        $arrayObject = new ArrayObject();
+
+        $arrayObject->validatedKeysSet(array('aRequiredField'), $throwOnInvalid = true);
+    }
+
+    /**
+     * @test
+     *
+     * @expectedException \Payum\Exception\LogicException
+     * @expectedExceptionMessage The otherRequiredField fields is not set.
+     */
+    public function throwIfSecondRequiredFieldNotSetAndThrowOnInvalidTrue()
+    {
+        $arrayObject = new ArrayObject();
+        $arrayObject['aRequiredField'] = 'foo';
+
+        $arrayObject->validatedKeysSet(array('aRequiredField', 'otherRequiredField'), $throwOnInvalid = true);
+    }
+
+    /**
+     * @test
+     *
+     * @expectedException \Payum\Exception\LogicException
+     * @expectedExceptionMessage The aRequiredField fields is not set.
+     */
+    public function throwByDefaultIfRequiredFieldNotSet()
+    {
+        $arrayObject = new ArrayObject();
+
+        $arrayObject->validatedKeysSet(array('aRequiredField'));
+    }
+
+    /**
+     * @test
+     */
+    public function shouldReturnFalseIfRequiredFieldNotSetAndThrowOnInvalidFalse()
+    {
+        $arrayObject = new ArrayObject();
+
+        $this->assertFalse($arrayObject->validatedKeysSet(array('aRequiredField'), $throwOnInvalid = false));
+    }
+
+    /**
+     * @test
+     */
+    public function shouldAllowValidateScalarNotSet()
+    {
+        $arrayObject = new ArrayObject();
+
+        $this->assertFalse($arrayObject->validatedKeysSet('aRequiredField', $throwOnInvalid = false));
+    }
+
+    /**
+     * @test
+     */
+    public function shouldReturnTrueIfRequiredFieldsSet()
+    {
+        $arrayObject = new ArrayObject();
+        $arrayObject['aRequiredField'] = 'foo';
+        $arrayObject['otherRequiredField'] = 'bar';
+
+        $this->assertTrue($arrayObject->validatedKeysSet(array('aRequiredField', 'otherRequiredField')));
+    }
 }
 
 class CustomArrayObject implements \ArrayAccess, \IteratorAggregate

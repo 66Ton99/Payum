@@ -1,19 +1,19 @@
 <?php
 namespace Payum\Tests\Action;
 
-use Payum\Action\SyncPaymentInstructionAggregateAction;
+use Payum\Action\SyncDetailsAggregatedModelAction;
 use Payum\Request\SyncRequest;
 
-class SyncPaymentInstructionAggregateActionTest extends \PHPUnit_Framework_TestCase
+class SyncDetailsAggregatedModelActionTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @test
      */
-    public function shouldBeSubClassOfActionPaymentAware()
+    public function shouldBeSubClassOfPaymentAwareAction()
     {
-        $rc = new \ReflectionClass('Payum\Action\SyncPaymentInstructionAggregateAction');
+        $rc = new \ReflectionClass('Payum\Action\SyncDetailsAggregatedModelAction');
         
-        $this->assertTrue($rc->isSubclassOf('Payum\Action\ActionPaymentAware'));
+        $this->assertTrue($rc->isSubclassOf('Payum\Action\PaymentAwareAction'));
     }
 
     /**
@@ -21,7 +21,7 @@ class SyncPaymentInstructionAggregateActionTest extends \PHPUnit_Framework_TestC
      */
     public function couldBeConstructedWithoutAnyArguments()   
     {
-        new SyncPaymentInstructionAggregateAction();
+        new SyncDetailsAggregatedModelAction();
     }
 
     /**
@@ -29,14 +29,14 @@ class SyncPaymentInstructionAggregateActionTest extends \PHPUnit_Framework_TestC
      */
     public function shouldSupportSyncRequestWithPaymentInstructionAggregateAsModel()
     {
-        $modelMock = $this->getMock('Payum\PaymentInstructionAggregateInterface');
+        $modelMock = $this->getMock('Payum\Model\DetailsAggregateInterface');
         $modelMock
             ->expects($this->atLeastOnce())
-            ->method('getPaymentInstruction')
+            ->method('getDetails')
             ->will($this->returnValue(new \stdClass))
         ;
         
-        $action = new SyncPaymentInstructionAggregateAction();
+        $action = new SyncDetailsAggregatedModelAction();
 
         $this->assertTrue($action->supports(new SyncRequest($modelMock)));
     }
@@ -46,14 +46,14 @@ class SyncPaymentInstructionAggregateActionTest extends \PHPUnit_Framework_TestC
      */
     public function shouldNotSupportSyncRequestWithPaymentInstructionAggregateAsModelIfInstructionNotSet()
     {
-        $modelMock = $this->getMock('Payum\PaymentInstructionAggregateInterface');
+        $modelMock = $this->getMock('Payum\Model\DetailsAggregateInterface');
         $modelMock
             ->expects($this->atLeastOnce())
-            ->method('getPaymentInstruction')
+            ->method('getDetails')
             ->will($this->returnValue(null))
         ;
 
-        $action = new SyncPaymentInstructionAggregateAction();
+        $action = new SyncDetailsAggregatedModelAction();
 
         $this->assertFalse($action->supports(new SyncRequest($modelMock)));
     }
@@ -63,7 +63,7 @@ class SyncPaymentInstructionAggregateActionTest extends \PHPUnit_Framework_TestC
      */
     public function shouldNotSupportNotSyncRequest()
     {
-        $action = new SyncPaymentInstructionAggregateAction();
+        $action = new SyncDetailsAggregatedModelAction();
         
         $request = new \stdClass();
 
@@ -75,7 +75,7 @@ class SyncPaymentInstructionAggregateActionTest extends \PHPUnit_Framework_TestC
      */
     public function shouldNotSupportSyncRequestAndNotPaymentInstructionAggregateAsModel()
     {
-        $action = new SyncPaymentInstructionAggregateAction();
+        $action = new SyncDetailsAggregatedModelAction();
         
         $request = new SyncRequest(new \stdClass());
         
@@ -89,7 +89,7 @@ class SyncPaymentInstructionAggregateActionTest extends \PHPUnit_Framework_TestC
      */
     public function throwIfNotSupportedRequestGivenAsArgumentForExecute()
     {
-        $action = new SyncPaymentInstructionAggregateAction();
+        $action = new SyncDetailsAggregatedModelAction();
 
         $action->execute(new \stdClass());
     }
@@ -113,13 +113,13 @@ class SyncPaymentInstructionAggregateActionTest extends \PHPUnit_Framework_TestC
             }))
         ;
         
-        $action = new SyncPaymentInstructionAggregateAction();
+        $action = new SyncDetailsAggregatedModelAction();
         $action->setPayment($paymentMock);
 
-        $modelMock = $this->getMock('Payum\PaymentInstructionAggregateInterface');
+        $modelMock = $this->getMock('Payum\Model\DetailsAggregateInterface');
         $modelMock
             ->expects($this->atLeastOnce())
-            ->method('getPaymentInstruction')
+            ->method('getDetails')
             ->will($this->returnValue($expectedInstruction))
         ;
         

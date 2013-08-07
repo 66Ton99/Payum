@@ -10,10 +10,12 @@ class BinaryMaskStatusRequestTest extends \PHPUnit_Framework_TestCase
         return array(
             array('isSuccess'),
             array('isCanceled'),
-            array('isInProgress'),
+            array('isPending'),
             array('isFailed'),
             array('isNew'),
             array('isUnknown'),
+            array('isSuspended'),
+            array('isExpired')
         );
     }
 
@@ -22,13 +24,15 @@ class BinaryMaskStatusRequestTest extends \PHPUnit_Framework_TestCase
         return array(
             array('markSuccess'),
             array('markCanceled'),
-            array('markInProgress'),
+            array('markPending'),
             array('markFailed'),
             array('markNew'),
             array('markUnknown'),
+            array('markSuspended'),
+            array('markExpired')
         );
     }
-    
+
     /**
      * @test
      */
@@ -75,8 +79,20 @@ class BinaryMaskStatusRequestTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
+     *
+     * @dataProvider provideIsXXXMethods
      */
-    public function shouldNotMatchOthersStatusIfMarkedSuccess()
+    public function shouldCallIsXXXStatus($isXXXMethod)
+    {
+        $statusRequest = new BinaryMaskStatusRequest(new \stdClass);
+
+        $this->assertInternalType('boolean', $statusRequest->$isXXXMethod());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldNotMatchOthersThenSuccessStatus()
     {
         $statusRequest = new BinaryMaskStatusRequest(new \stdClass);
 
@@ -85,7 +101,9 @@ class BinaryMaskStatusRequestTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($statusRequest->isSuccess());
         
         $this->assertFalse($statusRequest->isCanceled());
-        $this->assertFalse($statusRequest->isInProgress());
+        $this->assertFalse($statusRequest->isSuspended());
+        $this->assertFalse($statusRequest->isExpired());
+        $this->assertFalse($statusRequest->isPending());
         $this->assertFalse($statusRequest->isFailed());
         $this->assertFalse($statusRequest->isNew());
         $this->assertFalse($statusRequest->isUnknown());
@@ -94,7 +112,7 @@ class BinaryMaskStatusRequestTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function shouldNotMatchOthersStatusIfMarkedFailed()
+    public function shouldNotMatchOthersThenFailedStatus()
     {
         $statusRequest = new BinaryMaskStatusRequest(new \stdClass);
 
@@ -103,8 +121,10 @@ class BinaryMaskStatusRequestTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($statusRequest->isFailed());
         
         $this->assertFalse($statusRequest->isSuccess());
+        $this->assertFalse($statusRequest->isSuspended());
+        $this->assertFalse($statusRequest->isExpired());
         $this->assertFalse($statusRequest->isCanceled());
-        $this->assertFalse($statusRequest->isInProgress());
+        $this->assertFalse($statusRequest->isPending());
         $this->assertFalse($statusRequest->isNew());
         $this->assertFalse($statusRequest->isUnknown());
     }
@@ -112,15 +132,17 @@ class BinaryMaskStatusRequestTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function shouldNotMatchOthersStatusIfMarkedInPorgress()
+    public function shouldNotMatchOthersThenPendingStatus()
     {
         $statusRequest = new BinaryMaskStatusRequest(new \stdClass);
 
-        $statusRequest->markInProgress();
+        $statusRequest->markPending();
 
-        $this->assertTrue($statusRequest->isInProgress());
+        $this->assertTrue($statusRequest->isPending());
         
         $this->assertFalse($statusRequest->isFailed());
+        $this->assertFalse($statusRequest->isSuspended());
+        $this->assertFalse($statusRequest->isExpired());
         $this->assertFalse($statusRequest->isSuccess());
         $this->assertFalse($statusRequest->isCanceled());
         $this->assertFalse($statusRequest->isNew());
@@ -130,7 +152,7 @@ class BinaryMaskStatusRequestTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function shouldNotMatchOthersStatusIfMarkedCanceled()
+    public function shouldNotMatchOthersThenCanceledStatus()
     {
         $statusRequest = new BinaryMaskStatusRequest(new \stdClass);
 
@@ -138,7 +160,9 @@ class BinaryMaskStatusRequestTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($statusRequest->isCanceled());
         
-        $this->assertFalse($statusRequest->isInProgress());
+        $this->assertFalse($statusRequest->isPending());
+        $this->assertFalse($statusRequest->isSuspended());
+        $this->assertFalse($statusRequest->isExpired());
         $this->assertFalse($statusRequest->isFailed());
         $this->assertFalse($statusRequest->isSuccess());
         $this->assertFalse($statusRequest->isNew());
@@ -148,7 +172,7 @@ class BinaryMaskStatusRequestTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function shouldNotMatchOthersStatusIfMarkedNew()
+    public function shouldNotMatchOthersThenNewStatus()
     {
         $statusRequest = new BinaryMaskStatusRequest(new \stdClass);
 
@@ -157,8 +181,10 @@ class BinaryMaskStatusRequestTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($statusRequest->isNew());
 
         $this->assertFalse($statusRequest->isSuccess());
+        $this->assertFalse($statusRequest->isSuspended());
+        $this->assertFalse($statusRequest->isExpired());
         $this->assertFalse($statusRequest->isCanceled());
-        $this->assertFalse($statusRequest->isInProgress());
+        $this->assertFalse($statusRequest->isPending());
         $this->assertFalse($statusRequest->isFailed());
         $this->assertFalse($statusRequest->isUnknown());
     }
@@ -166,7 +192,7 @@ class BinaryMaskStatusRequestTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function shouldNotMatchOthersStatusIfMarkedUnknown()
+    public function shouldNotMatchOthersThenUnknownStatus()
     {
         $statusRequest = new BinaryMaskStatusRequest(new \stdClass);
 
@@ -175,10 +201,52 @@ class BinaryMaskStatusRequestTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($statusRequest->isUnknown());
 
         $this->assertFalse($statusRequest->isSuccess());
+        $this->assertFalse($statusRequest->isSuspended());
+        $this->assertFalse($statusRequest->isExpired());
         $this->assertFalse($statusRequest->isCanceled());
-        $this->assertFalse($statusRequest->isInProgress());
+        $this->assertFalse($statusRequest->isPending());
         $this->assertFalse($statusRequest->isFailed());
         $this->assertFalse($statusRequest->isNew());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldNotMatchOthersThenExpiredStatus()
+    {
+        $statusRequest = new BinaryMaskStatusRequest(new \stdClass);
+
+        $statusRequest->markExpired();
+
+        $this->assertTrue($statusRequest->isExpired());
+
+        $this->assertFalse($statusRequest->isSuccess());
+        $this->assertFalse($statusRequest->isSuspended());
+        $this->assertFalse($statusRequest->isCanceled());
+        $this->assertFalse($statusRequest->isPending());
+        $this->assertFalse($statusRequest->isFailed());
+        $this->assertFalse($statusRequest->isNew());
+        $this->assertFalse($statusRequest->isUnknown());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldNotMatchOthersThenSuspendedStatus()
+    {
+        $statusRequest = new BinaryMaskStatusRequest(new \stdClass);
+
+        $statusRequest->markSuspended();
+
+        $this->assertTrue($statusRequest->isSuspended());
+
+        $this->assertFalse($statusRequest->isSuccess());
+        $this->assertFalse($statusRequest->isExpired());
+        $this->assertFalse($statusRequest->isCanceled());
+        $this->assertFalse($statusRequest->isPending());
+        $this->assertFalse($statusRequest->isFailed());
+        $this->assertFalse($statusRequest->isNew());
+        $this->assertFalse($statusRequest->isUnknown());
     }
 }
 
